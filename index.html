@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>คัดแยกขยะ เริ่มต้นได้ที่รั้วโรงเรียน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF2E7;
+    --surface:#FFFFFF;
+    --surface-alt:#F5F7EF;
+    --ink:#202A1E;
+    --ink-soft:#586352;
+    --border:#D8E0CB;
+    --green:#386F3E;
+    --green-deep:#264F2B;
+    --green-tint:#E3EEDF;
+    --yellow:#D9A72A;
+    --yellow-tint:#FBF0D8;
+    --blue:#345E8C;
+    --blue-tint:#E1EAF3;
+    --red:#A8452F;
+    --red-tint:#F5E1DC;
+    --yellow-deep:#8A6414;
+    --radius:14px;
+    --maxw:1180px;
+    --content-w:700px;
+    --torn-clip:polygon(0% 100%,2% 35%,4% 90%,6% 25%,8% 85%,10% 15%,12% 75%,14% 10%,16% 90%,18% 20%,20% 80%,22% 12%,24% 92%,26% 28%,28% 82%,30% 18%,32% 78%,34% 12%,36% 88%,38% 22%,40% 80%,42% 10%,44% 90%,46% 30%,48% 85%,50% 15%,52% 78%,54% 12%,56% 88%,58% 20%,60% 82%,62% 15%,64% 90%,66% 25%,68% 80%,70% 18%,72% 78%,74% 12%,76% 88%,78% 22%,80% 82%,82% 15%,84% 90%,86% 25%,88% 80%,90% 18%,92% 78%,94% 12%,96% 88%,98% 22%,100% 100%);
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background-color:var(--bg);
+    color:var(--ink);
+    font-family:'Sarabun',sans-serif;
+    font-size:16.5px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Kanit',sans-serif;
+    color:var(--ink);
+    margin:0;
+    line-height:1.25;
+  }
+  p{margin:0 0 1em 0;}
+  p:last-child{margin-bottom:0;}
+  ul{margin:0;padding:0;list-style:none;}
+  a{color:inherit;}
+  img,svg{display:block;}
+  :focus-visible{outline:3px solid var(--blue);outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.01ms !important;transition-duration:0.01ms !important;}
+  }
+
+  .icon{width:1.5em;height:1.5em;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+  /* ---------- top nav ---------- */
+  .topnav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(238,242,231,0.92);
+    backdrop-filter:saturate(140%) blur(6px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-progress{
+    position:absolute;left:0;bottom:-2px;height:3px;width:0%;
+    background:linear-gradient(90deg,var(--green),var(--yellow-deep),var(--blue),var(--red));
+    transition:width .1s linear;
+  }
+  .topnav-inner{
+    max-width:var(--maxw);margin:0 auto;padding:0 20px;
+    display:flex;align-items:center;gap:24px;height:58px;
+  }
+  .wordmark{
+    font-family:'Kanit',sans-serif;font-weight:700;font-size:1.05rem;
+    white-space:nowrap;display:flex;align-items:center;gap:8px;color:var(--green-deep);
+  }
+  .wordmark .icon{color:var(--green);}
+  .topnav-links{
+    display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;
+    -ms-overflow-style:none;height:100%;
+  }
+  .topnav-links::-webkit-scrollbar{display:none;}
+  .topnav-links a{
+    flex-shrink:0;display:flex;align-items:center;
+    font-size:0.9rem;color:var(--ink-soft);text-decoration:none;
+    padding:0 12px;height:100%;border-bottom:2.5px solid transparent;
+    white-space:nowrap;font-weight:500;transition:color .15s ease,border-color .15s ease;
+  }
+  .topnav-links a:hover{color:var(--ink);}
+  .topnav-links a.active{font-weight:600;}
+  .topnav-links a:nth-child(1).active,
+  .topnav-links a:nth-child(2).active,
+  .topnav-links a:nth-child(5).active,
+  .topnav-links a:nth-child(8).active{color:var(--green-deep);border-color:var(--green);}
+  .topnav-links a:nth-child(3).active,
+  .topnav-links a:nth-child(6).active,
+  .topnav-links a:nth-child(10).active{color:var(--yellow-deep);border-color:var(--yellow-deep);}
+  .topnav-links a:nth-child(4).active,
+  .topnav-links a:nth-child(7).active{color:var(--blue);border-color:var(--blue);}
+  .topnav-links a:nth-child(9).active{color:var(--red);border-color:var(--red);}
+
+  /* ---------- hero ---------- */
+  header.hero{
+    position:relative;overflow:hidden;
+    background:linear-gradient(180deg,var(--green-tint) 0%,var(--bg) 100%);
+  }
+  header.hero::before{
+    content:'';position:absolute;inset:0;z-index:0;opacity:0.55;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 6% 22%, var(--yellow) 0 7px, transparent 8px),
+      radial-gradient(circle at 93% 12%, var(--blue) 0 6px, transparent 7px),
+      radial-gradient(circle at 88% 68%, var(--red) 0 6px, transparent 7px),
+      radial-gradient(circle at 20% 88%, var(--green) 0 7px, transparent 8px),
+      radial-gradient(circle at 55% 6%, var(--yellow) 0 5px, transparent 6px),
+      radial-gradient(circle at 40% 95%, var(--blue) 0 5px, transparent 6px);
+  }
+  header.hero::after{
+    content:'';position:absolute;left:0;bottom:-16px;width:100%;height:32px;z-index:1;
+    background-color:var(--bg);clip-path:var(--torn-clip);
+  }
+  .hero{
+    position:relative;z-index:2;
+    max-width:var(--maxw);margin:0 auto;padding:64px 20px 56px;
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;
+  }
+  .hero-copy{animation:riseIn .7s ease both;}
+  @keyframes riseIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+  .hero-tag{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--green-tint);color:var(--green-deep);
+    font-size:0.85rem;font-weight:600;padding:6px 14px;border-radius:100px;
+    margin-bottom:20px;transform:rotate(-2deg);box-shadow:3px 3px 0 var(--green);
+  }
+  .hero h1{font-size:clamp(2.1rem,4.6vw,3.15rem);font-weight:800;letter-spacing:-0.01em;}
+  .hero p.lead{
+    font-size:1.15rem;color:var(--ink-soft);margin-top:18px;max-width:46ch;
+  }
+  .hero-actions{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;}
+  .btn{
+    font-family:'Sarabun',sans-serif;font-weight:600;font-size:0.98rem;
+    padding:13px 24px;border-radius:10px;border:1.5px solid transparent;
+    cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .15s ease,background .15s ease,box-shadow .15s ease;
+  }
+  .btn-primary{background:var(--green);color:#fff;box-shadow:4px 4px 0 var(--green-deep);}
+  .btn-primary:hover{background:var(--green-deep);transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--green-deep);}
+  .btn-primary:active{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--green-deep);}
+  .btn-ghost{background:var(--surface);border-color:var(--ink);color:var(--ink);box-shadow:4px 4px 0 var(--border);}
+  .btn-ghost:hover{border-color:var(--green-deep);color:var(--green-deep);transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--border);}
+  .btn-ghost:active{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--border);}
+
+  .bin-row{
+    display:flex;justify-content:space-between;gap:14px;
+    padding-bottom:16px;border-bottom:3px dashed var(--green);
+  }
+  .bin-item{display:flex;flex-direction:column;align-items:center;gap:10px;flex:1;}
+  .bin-svg{width:100%;max-width:84px;height:auto;transition:transform .2s ease;}
+  .bin-item:nth-child(odd){transform:translateY(-4px);}
+  .bin-item:hover .bin-svg{transform:translateY(-4px) rotate(-4deg);}
+  .bin-label{
+    text-align:center;font-size:0.8rem;font-weight:600;color:var(--ink-soft);
+    background:var(--surface);padding:5px 10px;border-radius:8px;
+    box-shadow:2px 2px 0 rgba(32,42,30,0.1);
+  }
+  .bin-label b{display:block;font-family:'Kanit',sans-serif;font-size:0.95rem;font-weight:600;color:var(--ink);}
+
+  /* ---------- main layout ---------- */
+  main{max-width:100%;margin:0 auto;padding:0 0 0;}
+  main > section{
+    position:relative;padding:60px 20px;scroll-margin-top:78px;
+  }
+  main > section > *{max-width:var(--content-w);margin-left:auto;margin-right:auto;}
+  main > section::before{
+    content:'';position:absolute;left:0;top:-16px;width:100%;height:32px;
+    background-color:inherit;clip-path:var(--torn-clip);
+  }
+
+  #why,#types,#3r,#roles,#quiz{
+    background-color:var(--bg);
+    background-image:radial-gradient(var(--border) 1.2px, transparent 1.2px);
+    background-size:24px 24px;
+  }
+  #meaning,#activities{background-color:var(--green-tint);}
+  #howto{background-color:var(--blue-tint);}
+  #benefits{background-color:var(--yellow-tint);}
+  #problems{background-color:var(--red-tint);}
+
+  #why,#meaning,#3r,#activities{--accent:var(--green-deep);}
+  #types,#benefits,#quiz{--accent:var(--yellow-deep);}
+  #howto,#roles{--accent:var(--blue);}
+  #problems{--accent:var(--red);}
+
+  .eyebrow-icon{
+    width:46px;height:46px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:18px;margin-left:0;margin-right:auto;
+    transform:rotate(-4deg);box-shadow:4px 4px 0 currentColor;
+  }
+  section h2{font-size:clamp(1.5rem,2.6vw,1.9rem);font-weight:700;max-width:26ch;}
+  section h2::after{
+    content:'';display:block;width:64px;height:12px;margin-top:12px;margin-bottom:20px;
+    background-repeat:no-repeat;background-size:contain;
+    background-image:var(--squiggle);
+  }
+  section .section-lead{font-size:1.02rem;color:var(--ink-soft);margin-bottom:24px;}
+  section h3{font-size:1.08rem;font-weight:600;margin-bottom:8px;}
+
+  #why,#meaning,#3r,#activities{
+    --squiggle:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 10'%3E%3Cpath d='M2 6c4-6 8 6 12 0s8-6 12 0 8 6 12 0 8-6 12 0 8 6 10 0' fill='none' stroke='%23264F2B' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  #types,#benefits,#quiz{
+    --squiggle:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 10'%3E%3Cpath d='M2 6c4-6 8 6 12 0s8-6 12 0 8 6 12 0 8-6 12 0 8 6 10 0' fill='none' stroke='%238A6414' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  #howto,#roles{
+    --squiggle:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 10'%3E%3Cpath d='M2 6c4-6 8 6 12 0s8-6 12 0 8 6 12 0 8-6 12 0 8 6 10 0' fill='none' stroke='%23345E8C' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+  #problems{
+    --squiggle:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 10'%3E%3Cpath d='M2 6c4-6 8 6 12 0s8-6 12 0 8 6 12 0 8-6 12 0 8 6 10 0' fill='none' stroke='%23A8452F' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+
+  .why-icon{background:var(--green-tint);color:var(--green-deep);}
+  .meaning-icon{background:var(--surface);color:var(--green-deep);}
+  .types-icon{background:var(--yellow-tint);color:var(--yellow-deep);}
+  .howto-icon{background:var(--surface);color:var(--blue);}
+  .r3-icon{background:var(--surface);color:var(--green-deep);}
+  .benefits-icon{background:var(--surface);color:var(--yellow-deep);}
+  .roles-icon{background:var(--blue-tint);color:var(--blue);}
+  .activities-icon{background:var(--surface);color:var(--green-deep);}
+  .problems-icon{background:var(--surface);color:var(--red);}
+  .quiz-icon{background:var(--yellow-tint);color:var(--yellow-deep);}
+
+  /* ---------- waste type cards ---------- */
+  .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:12px;}
+  .type-card{
+    position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:20px;box-shadow:5px 5px 0 var(--c);
+    transition:transform .2s ease,box-shadow .2s ease;
+  }
+  .type-grid .type-card:nth-child(1){transform:rotate(-1.4deg);}
+  .type-grid .type-card:nth-child(2){transform:rotate(1.2deg);}
+  .type-grid .type-card:nth-child(3){transform:rotate(1deg);}
+  .type-grid .type-card:nth-child(4){transform:rotate(-1.2deg);}
+  .type-card:hover{transform:rotate(0deg) translateY(-3px);box-shadow:8px 8px 0 var(--c);}
+  .type-card::before{
+    content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+    width:13px;height:13px;border-radius:50%;background:var(--c);
+    box-shadow:0 2px 3px rgba(0,0,0,0.25);
+  }
+  .type-card .bin-svg{width:56px;margin-bottom:10px;}
+  .type-card h3{font-family:'Kanit',sans-serif;}
+  .type-card .ex{
+    margin-top:12px;font-size:0.88rem;color:var(--ink-soft);
+    padding-top:10px;border-top:1px dashed var(--border);
+  }
+  .type-note{
+    margin-top:22px;font-size:0.9rem;color:var(--ink-soft);
+    background:var(--surface);border:1.5px dashed var(--yellow-deep);border-radius:10px;padding:14px 16px;
+  }
+
+  /* ---------- steps ---------- */
+  .steps{display:flex;flex-direction:column;gap:0;margin-top:8px;}
+  .step{display:grid;grid-template-columns:34px 1fr;gap:16px;position:relative;padding-bottom:28px;}
+  .step:last-child{padding-bottom:0;}
+  .step-num{
+    width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;
+    font-weight:700;font-size:0.95rem;position:relative;z-index:1;
+    box-shadow:3px 3px 0 var(--blue-tint);
+  }
+  .step:not(:last-child)::before{
+    content:'';position:absolute;left:16.5px;top:34px;bottom:0;width:2px;background:var(--border);
+  }
+  .step h3{margin-bottom:4px;}
+  .step p{color:var(--ink-soft);font-size:0.97rem;}
+
+  /* ---------- 3R cards ---------- */
+  .r3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:12px;}
+  .r3-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px;box-shadow:5px 5px 0 var(--green-tint);
+    transition:transform .2s ease,box-shadow .2s ease;
+  }
+  .r3-grid .r3-card:nth-child(1){transform:rotate(-1.2deg);}
+  .r3-grid .r3-card:nth-child(3){transform:rotate(1.2deg);}
+  .r3-card:hover{transform:rotate(0deg) translateY(-3px);box-shadow:7px 7px 0 var(--green-tint);}
+  .r3-card .icon{color:var(--green);margin-bottom:10px;}
+  .r3-card h3{font-family:'Kanit',sans-serif;font-size:1.02rem;}
+  .r3-card p{font-size:0.9rem;color:var(--ink-soft);margin-top:6px;}
+
+  /* ---------- benefits list ---------- */
+  .plain-list{display:flex;flex-direction:column;gap:20px;margin-top:12px;}
+  .plain-item{display:flex;gap:16px;align-items:flex-start;}
+  .plain-item .icon-badge{
+    width:38px;height:38px;border-radius:50%;background:var(--surface);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    box-shadow:3px 3px 0 var(--yellow-deep);
+  }
+  .plain-item .icon{color:var(--yellow-deep);width:1.25em;height:1.25em;}
+  .plain-item h3{margin-bottom:3px;font-size:1rem;}
+  .plain-item p{font-size:0.94rem;color:var(--ink-soft);}
+
+  /* ---------- roles ---------- */
+  .role-block{
+    margin-bottom:20px;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:20px 22px;box-shadow:5px 5px 0 var(--blue-tint);
+  }
+  .role-block:last-child{margin-bottom:0;}
+  .role-block h3{
+    font-family:'Kanit',sans-serif;font-size:1.05rem;color:var(--blue);
+    display:flex;align-items:center;gap:8px;margin-bottom:12px;
+  }
+  .role-block .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+  .role-block ul{display:flex;flex-direction:column;gap:8px;}
+  .role-block li{
+    font-size:0.96rem;color:var(--ink-soft);padding-left:18px;position:relative;
+  }
+  .role-block li::before{
+    content:'';position:absolute;left:0;top:0.65em;width:6px;height:6px;border-radius:50%;
+    background:var(--blue);opacity:0.5;
+  }
+
+  /* ---------- activities ---------- */
+  .activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:14px;}
+  .activity-card{
+    position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:20px 18px 18px;box-shadow:5px 5px 0 rgba(32,42,30,0.14);
+    transition:transform .2s ease,box-shadow .2s ease;
+  }
+  .activity-card:hover{transform:translateY(-3px) rotate(0deg) !important;box-shadow:7px 7px 0 rgba(32,42,30,0.14);}
+  .activity-grid .activity-card:nth-child(1){transform:rotate(1.3deg);}
+  .activity-grid .activity-card:nth-child(2){transform:rotate(-1.1deg);}
+  .activity-grid .activity-card:nth-child(3){transform:rotate(-1deg);}
+  .activity-grid .activity-card:nth-child(4){transform:rotate(1.2deg);}
+  .activity-grid .activity-card:nth-child(5){transform:rotate(1deg);}
+  .activity-grid .activity-card:nth-child(6){transform:rotate(-1.3deg);}
+  .activity-card::before{
+    content:'';position:absolute;top:-8px;left:24px;width:13px;height:13px;border-radius:50%;
+    box-shadow:0 2px 3px rgba(0,0,0,0.25);
+  }
+  .activity-grid .activity-card:nth-child(4n+1)::before{background:var(--green);}
+  .activity-grid .activity-card:nth-child(4n+2)::before{background:var(--yellow-deep);}
+  .activity-grid .activity-card:nth-child(4n+3)::before{background:var(--blue);}
+  .activity-grid .activity-card:nth-child(4n+4)::before{background:var(--red);}
+  .activity-card h3{font-family:'Kanit',sans-serif;font-size:0.98rem;color:var(--green-deep);margin-bottom:6px;}
+  .activity-card p{font-size:0.9rem;color:var(--ink-soft);}
+
+  /* ---------- problems (editorial) ---------- */
+  .problem-block{
+    margin-bottom:16px;padding:18px 20px;background:var(--surface);
+    border-radius:var(--radius);box-shadow:5px 5px 0 var(--red);
+    border-left:4px solid var(--red);
+  }
+  .problem-block:last-child{margin-bottom:0;}
+  .problem-block .p-issue{
+    font-weight:600;font-family:'Kanit',sans-serif;font-size:1rem;margin-bottom:6px;
+    display:flex;align-items:center;gap:8px;color:var(--red);
+  }
+  .problem-block p{font-size:0.96rem;color:var(--ink-soft);}
+  .problem-block .fix-label{color:var(--green-deep);font-weight:600;}
+
+  /* ---------- quiz ---------- */
+  .quiz-list{display:flex;flex-direction:column;gap:14px;margin-top:14px;}
+  .quiz-item{
+    background:var(--surface);border:2px dashed var(--yellow-deep);border-radius:var(--radius);
+    padding:16px 18px;transition:box-shadow .2s ease;
+    box-shadow:4px 4px 0 var(--yellow-tint);
+  }
+  .quiz-item.open{box-shadow:4px 4px 0 var(--green-tint);border-color:var(--green);}
+  .quiz-q{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .quiz-q span{font-weight:500;}
+  .quiz-btn{
+    background:var(--surface);border:1.5px solid var(--yellow-deep);color:var(--yellow-deep);
+    font-family:'Sarabun',sans-serif;font-size:0.85rem;font-weight:600;
+    padding:8px 14px;border-radius:8px;cursor:pointer;flex-shrink:0;
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .quiz-btn:hover{background:var(--green);color:#fff;border-color:var(--green);}
+  .quiz-answer{
+    max-height:0;overflow:hidden;opacity:0;
+    transition:max-height .3s ease,opacity .3s ease,margin-top .3s ease;
+  }
+  .quiz-item.open .quiz-answer{max-height:80px;opacity:1;margin-top:12px;}
+  .quiz-tag{
+    display:inline-flex;align-items:center;gap:6px;font-size:0.85rem;font-weight:600;
+    padding:5px 12px;border-radius:100px;margin-bottom:6px;
+  }
+  .quiz-tag.g{background:var(--green-tint);color:var(--green-deep);}
+  .quiz-tag.y{background:var(--yellow-tint);color:#8a6414;}
+  .quiz-tag.b{background:var(--blue-tint);color:var(--blue);}
+  .quiz-tag.r{background:var(--red-tint);color:var(--red);}
+  .quiz-answer p{font-size:0.9rem;color:var(--ink-soft);}
+
+  /* ---------- footer ---------- */
+  footer{
+    position:relative;background:var(--green-deep);color:#EFF3E7;padding:60px 20px 52px;
+  }
+  footer::before{
+    content:'';position:absolute;left:0;top:-16px;width:100%;height:32px;
+    background-color:var(--green-deep);clip-path:var(--torn-clip);
+  }
+  .footer-inner{max-width:var(--content-w);margin:0 auto;text-align:left;}
+  footer h2{color:#fff;font-size:1.5rem;margin-bottom:14px;}
+  footer p{color:#CFDCC9;font-size:1rem;max-width:56ch;}
+  .back-top{
+    display:inline-flex;align-items:center;gap:8px;margin-top:26px;
+    background:#fff;color:var(--green-deep);text-decoration:none;font-weight:600;font-size:0.92rem;
+    padding:10px 18px;border-radius:100px;box-shadow:4px 4px 0 rgba(0,0,0,0.25);
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .back-top:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 rgba(0,0,0,0.25);}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;padding-top:36px;gap:32px;}
+    .hero-copy{order:1;}
+    .bin-row{order:0;max-width:420px;margin:0 auto;}
+  }
+  @media (max-width:620px){
+    .type-grid,.activity-grid{grid-template-columns:1fr;}
+    .r3-grid{grid-template-columns:1fr;}
+    main > section{padding:44px 16px;}
+    .hero{padding:28px 16px 40px;}
+    .type-card,.activity-card,.r3-card{transform:none !important;}
+    .type-card:hover,.activity-card:hover,.r3-card:hover{transform:translateY(-3px) !important;}
+  }
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 6-15 15-16-1 9-7 15-16 16Z"/><path d="M4 20c3-4 6.5-7.5 11-10.5"/></symbol>
+  <symbol id="i-recycle" viewBox="0 0 24 24"><path d="M17 3l3 3-3 3"/><path d="M20 6H9a5 5 0 0 0-5 5v1"/><path d="M7 21l-3-3 3-3"/><path d="M4 18h11a5 5 0 0 0 5-5v-1"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 7h12l-1.1 13.2A1 1 0 0 1 15.9 21H8.1a1 1 0 0 1-1-.8L6 7Z"/><path d="M9 7V5.5A3 3 0 0 1 12 2.5a3 3 0 0 1 3 3V7"/><path d="M4 7h16"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3 22 20H2Z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9.3 18h5.4"/><path d="M10.2 21h3.6"/><path d="M12 3a6 6 0 0 0-3.4 10.9c.6.5 1 1.2 1 2V17h4.8v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.6A2.6 2.6 0 0 1 6.6 3H12v18H6.6A2.6 2.6 0 0 0 4 23.6V5.6Z"/><path d="M20 5.6A2.6 2.6 0 0 0 17.4 3H12v18h5.4a2.6 2.6 0 0 1 2.6 2.6V5.6Z"/></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><path d="M9.5 6.5H21"/><path d="M9.5 12H21"/><path d="M9.5 17.5H21"/><circle cx="4" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4" cy="17.5" r="1.3" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.6 2.6L16.2 9"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="8.7" cy="9" r="3"/><path d="M2.5 20.2c0-3.4 2.8-6.2 6.2-6.2s6.2 2.8 6.2 6.2"/><circle cx="17.3" cy="9.8" r="2.3"/><path d="M15.8 13.9a5 5 0 0 1 6.2 4.8"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5.3" width="17" height="15.2" rx="2.2"/><path d="M3.5 10h17"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M12 13.2l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3Z"/></symbol>
+  <symbol id="i-question" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.6a2.9 2.9 0 1 1 4 2.7c-.9.4-1.2.9-1.2 1.8v.4"/><circle cx="12" cy="17.3" r="0.9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 4v13"/><path d="M7.5 13l4.5 4.5 4.5-4.5"/><path d="M6 20.5h12"/></symbol>
+  <symbol id="i-arrow-loop" viewBox="0 0 24 24"><path d="M4.2 12.4A8 8 0 1 1 7 18.6"/><path d="M4.2 18.6v-5.4h5.4"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V6"/><path d="M6 11l6-6 6 6"/></symbol>
+</svg>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="wordmark">
+      <svg class="icon" style="width:1.3em;height:1.3em"><use href="#i-leaf"/></svg>
+      คัดแยกขยะในโรงเรียน
+    </span>
+    <div class="topnav-links" id="topnavLinks">
+      <a href="#why">ทำไมต้องคัดแยก</a>
+      <a href="#meaning">ขยะคืออะไร</a>
+      <a href="#types">ขยะ 4 ประเภท</a>
+      <a href="#howto">วิธีคัดแยก</a>
+      <a href="#3r">หลัก 3R</a>
+      <a href="#benefits">ประโยชน์</a>
+      <a href="#roles">บทบาทของแต่ละฝ่าย</a>
+      <a href="#activities">ไอเดียกิจกรรม</a>
+      <a href="#problems">ปัญหาที่พบบ่อย</a>
+      <a href="#quiz">ทดสอบความเข้าใจ</a>
+    </div>
+  </div>
+  <div class="nav-progress" id="navProgress"></div>
+</nav>
+
+<header class="hero">
+  <div class="hero-copy">
+    <span class="hero-tag">
+      <svg class="icon" style="width:1em;height:1em"><use href="#i-book"/></svg>
+      คู่มือสำหรับโรงเรียน
+    </span>
+    <h1>คัดแยกขยะ เริ่มต้นได้ที่รั้วโรงเรียน</h1>
+    <p class="lead">ทำความรู้จักขยะแต่ละประเภท เรียนรู้ขั้นตอนการคัดแยกที่ถูกต้อง และค้นไอเดียกิจกรรมที่ชวนทั้งโรงเรียนลงมือทำไปด้วยกัน ตั้งแต่ห้องเรียนไปจนถึงโรงอาหาร</p>
+    <div class="hero-actions">
+      <a href="#why" class="btn btn-primary">เริ่มอ่านเนื้อหา</a>
+      <a href="#types" class="btn btn-ghost">ดูขยะ 4 ประเภทเลย</a>
+    </div>
+  </div>
+  <div class="bin-row" aria-hidden="true">
+    <div class="bin-item">
+      <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--green)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+      <span class="bin-label"><b>เขียว</b>อินทรีย์</span>
+    </div>
+    <div class="bin-item">
+      <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--yellow)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+      <span class="bin-label"><b>เหลือง</b>รีไซเคิล</span>
+    </div>
+    <div class="bin-item">
+      <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--blue)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+      <span class="bin-label"><b>น้ำเงิน</b>ทั่วไป</span>
+    </div>
+    <div class="bin-item">
+      <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--red)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+      <span class="bin-label"><b>แดง</b>อันตราย</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section id="why">
+    <div class="eyebrow-icon why-icon"><svg class="icon"><use href="#i-bulb"/></svg></div>
+    <h2>ทำไมการคัดแยกขยะในโรงเรียนจึงสำคัญ</h2>
+    <p>ในแต่ละวันโรงเรียนแห่งหนึ่งสร้างขยะจากหลายกิจกรรมพร้อมกัน ตั้งแต่มื้อกลางวันของนักเรียนหลายร้อยคน เศษกระดาษจากห้องเรียน ขวดน้ำและซองขนมจากโรงอาหาร ไปจนถึงเศษวัสดุจากกิจกรรมศิลปะหรือวิทยาศาสตร์ ถ้าขยะทั้งหมดถูกทิ้งรวมกันในถังเดียว สิ่งของที่ยังมีมูลค่า เช่น กระดาษ ขวดพลาสติก หรือกระป๋องอะลูมิเนียม จะเปื้อนเศษอาหารจนนำกลับมาใช้ประโยชน์ไม่ได้อีก และต้องจบลงที่การฝังกลบหรือเผาทิ้งทั้งหมดเหมือนกัน</p>
+    <p>การคัดแยกขยะตั้งแต่ต้นทางในโรงเรียนจึงมีความหมายมากกว่าความสะอาดของถังขยะ เพราะเป็นการปลูกฝังพฤติกรรมและความเข้าใจที่นักเรียนจะติดตัวไปใช้ที่บ้านและในชุมชนต่อไป โรงเรียนที่มีระบบคัดแยกที่ดียังช่วยลดปริมาณขยะที่ต้องส่งไปกำจัด ลดภาระค่าใช้จ่าย และสามารถสร้างรายได้เล็กๆ น้อยๆ จากการขายวัสดุรีไซเคิลเข้ากองทุนของโรงเรียนได้อีกด้วย</p>
+  </section>
+
+  <section id="meaning">
+    <div class="eyebrow-icon meaning-icon"><svg class="icon"><use href="#i-book"/></svg></div>
+    <h2>ขยะคืออะไร คัดแยกแล้วได้อะไร</h2>
+    <p><b>ขยะ</b> คือสิ่งของหรือวัสดุเหลือใช้ที่เจ้าของไม่ต้องการอีกต่อไป ซึ่งเกิดขึ้นได้จากแทบทุกกิจกรรมในโรงเรียน ทั้งการเรียน การกิน และการทำกิจกรรมต่างๆ</p>
+    <p><b>การคัดแยกขยะ</b> คือการแบ่งขยะออกเป็นกลุ่มตามลักษณะและวิธีจัดการที่เหมาะสม ตั้งแต่จุดที่ทิ้ง ก่อนจะถูกนำไปกำจัดหรือนำกลับมาใช้ใหม่ หัวใจสำคัญคือ &ldquo;ทิ้งให้ถูกถังตั้งแต่ครั้งแรก&rdquo; เพราะเมื่อขยะแต่ละประเภทถูกแยกออกจากกันอย่างชัดเจน ทุกขั้นตอนหลังจากนั้น ไม่ว่าจะเป็นการเก็บขน การรีไซเคิล หรือการกำจัด ก็จะทำได้ง่ายและมีประสิทธิภาพมากขึ้นตามไปด้วย</p>
+  </section>
+
+  <section id="types">
+    <div class="eyebrow-icon types-icon"><svg class="icon"><use href="#i-recycle"/></svg></div>
+    <h2>ขยะ 4 ประเภทหลัก กับสีถังมาตรฐาน</h2>
+    <p class="section-lead">ประเทศไทยใช้ระบบถังขยะ 4 สีเป็นมาตรฐานทั่วไป แต่ละสีบอกวิธีจัดการขยะที่แตกต่างกัน การจดจำสีเหล่านี้คือจุดเริ่มต้นของการคัดแยกที่ถูกต้อง</p>
+    <div class="type-grid">
+      <div class="type-card" style="--c:var(--green)">
+        <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--green)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+        <h3>สีเขียว — ขยะอินทรีย์</h3>
+        <p>ขยะเปียกที่ย่อยสลายได้ตามธรรมชาติ นำไปทำปุ๋ยหมักหรือน้ำหมักชีวภาพต่อได้</p>
+        <p class="ex">ตัวอย่าง: เศษอาหาร เปลือกผลไม้ เศษผัก ใบไม้ ก้างปลา</p>
+      </div>
+      <div class="type-card" style="--c:var(--yellow)">
+        <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--yellow)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+        <h3>สีเหลือง — ขยะรีไซเคิล</h3>
+        <p>วัสดุที่นำกลับไปแปรรูปใหม่ได้ ควรล้างและผึ่งให้แห้งก่อนทิ้งทุกครั้ง</p>
+        <p class="ex">ตัวอย่าง: ขวดพลาสติก ขวดแก้ว กระดาษ กล่องนม กระป๋องอะลูมิเนียม</p>
+      </div>
+      <div class="type-card" style="--c:var(--blue)">
+        <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--blue)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+        <h3>สีน้ำเงิน — ขยะทั่วไป</h3>
+        <p>ย่อยสลายยากและไม่คุ้มค่าการรีไซเคิล ส่วนใหญ่จบที่การฝังกลบ</p>
+        <p class="ex">ตัวอย่าง: ซองขนม ถุงพลาสติกเปื้อน โฟมเปื้อนอาหาร ฟอยล์ใช้แล้ว</p>
+      </div>
+      <div class="type-card" style="--c:var(--red)">
+        <svg class="bin-svg" viewBox="0 0 90 110" style="--bin:var(--red)"><rect x="14" y="30" width="62" height="66" rx="10" fill="var(--bin)" opacity="0.15"/><rect x="14" y="30" width="62" height="66" rx="10" fill="none" stroke="var(--bin)" stroke-width="4"/><rect x="8" y="16" width="74" height="16" rx="8" fill="var(--bin)"/><rect x="34" y="6" width="22" height="10" rx="4" fill="var(--bin)"/><path d="M30 46v34M45 46v34M60 46v34" stroke="var(--bin)" stroke-width="4" stroke-linecap="round"/></svg>
+        <h3>สีแดง — ขยะอันตราย</h3>
+        <p>เป็นพิษต่อคนและสิ่งแวดล้อม ต้องแยกเก็บต่างหากและส่งไปกำจัดเฉพาะ</p>
+        <p class="ex">ตัวอย่าง: ถ่านไฟฉาย หลอดไฟ กระป๋องสเปรย์ สารเคมี ยาหมดอายุ</p>
+      </div>
+    </div>
+    <p class="type-note">สีของถังขยะอาจแตกต่างกันไปบ้างในแต่ละพื้นที่หรือผู้ผลิต แนะนำให้สังเกตป้ายหรือภาพตัวอย่างขยะที่ติดอยู่ข้างถังของโรงเรียนตัวเองประกอบกันเสมอ</p>
+  </section>
+
+  <section id="howto">
+    <div class="eyebrow-icon howto-icon"><svg class="icon"><use href="#i-steps"/></svg></div>
+    <h2>ขั้นตอนการคัดแยกขยะอย่างถูกวิธี</h2>
+    <p class="section-lead">การคัดแยกที่ดีเริ่มจากนิสัยง่ายๆ เพียง 5 ขั้นตอนนี้ ทำจนคุ้นเคยแล้วจะกลายเป็นเรื่องปกติในชีวิตประจำวัน</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div><h3>สังเกตก่อนทิ้ง</h3><p>ก่อนโยนสิ่งของลงถัง ให้หยุดดูสักครู่ว่าเป็นเศษอาหาร วัสดุรีไซเคิล ขยะทั่วไป หรือของอันตราย</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div><h3>ทำความสะอาดก่อนแยก</h3><p>ล้างคราบอาหารออกจากขวดหรือกล่องก่อนทิ้งลงถังรีไซเคิล เพื่อไม่ให้ขยะเปียกปนเปื้อนขยะแห้ง</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div><h3>ทิ้งให้ตรงสี</h3><p>วางของลงในถังที่ตรงกับประเภทให้ถูกต้อง หากไม่แน่ใจให้ดูป้ายตัวอย่างขยะที่ติดข้างถัง</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div><h3>ลดปริมาณก่อนทิ้ง</h3><p>พับกล่องกระดาษให้แบน บีบขวดพลาสติกให้แบนก่อนปิดฝา เพื่อประหยัดพื้นที่ถังและรถขนขยะ</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div><h3>ส่งขยะอันตรายแยกจุด</h3><p>ของอย่างถ่านไฟฉายหรือหลอดไฟ ให้นำไปทิ้งที่จุดรับทิ้งเฉพาะของโรงเรียน ไม่ปนกับขยะประเภทอื่น</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="3r">
+    <div class="eyebrow-icon r3-icon"><svg class="icon"><use href="#i-arrow-loop"/></svg></div>
+    <h2>หลัก 3R ที่ใช้ได้จริงในรั้วโรงเรียน</h2>
+    <p class="section-lead">การคัดแยกช่วยจัดการขยะที่เกิดขึ้นแล้ว แต่หลัก 3R ช่วยลดปริมาณขยะตั้งแต่ต้นทาง ก่อนที่มันจะกลายเป็นขยะด้วยซ้ำ</p>
+    <div class="r3-grid">
+      <div class="r3-card">
+        <svg class="icon"><use href="#i-arrow-down"/></svg>
+        <h3>Reduce ลดการใช้</h3>
+        <p>พกกระบอกน้ำและปิ่นโตมาเอง หลีกเลี่ยงถุงพลาสติกและกล่องโฟมแบบใช้ครั้งเดียวทิ้ง</p>
+      </div>
+      <div class="r3-card">
+        <svg class="icon"><use href="#i-arrow-loop"/></svg>
+        <h3>Reuse ใช้ซ้ำ</h3>
+        <p>นำกระดาษที่ใช้หน้าเดียวมาทำสมุดจด หรือใช้ขวดแก้วปลูกต้นไม้เล็กๆ ในห้องเรียน</p>
+      </div>
+      <div class="r3-card">
+        <svg class="icon"><use href="#i-recycle"/></svg>
+        <h3>Recycle นำกลับมาใช้ใหม่</h3>
+        <p>รวบรวมขวดพลาสติก กระดาษ และกระป๋อง ส่งขายหรือส่งต่อให้โรงงานรีไซเคิล</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="benefits">
+    <div class="eyebrow-icon benefits-icon"><svg class="icon"><use href="#i-check"/></svg></div>
+    <h2>ประโยชน์ที่โรงเรียนจะได้รับ</h2>
+    <div class="plain-list">
+      <div class="plain-item">
+        <div class="icon-badge"><svg class="icon"><use href="#i-leaf"/></svg></div>
+        <div><h3>สิ่งแวดล้อมในโรงเรียนสะอาดขึ้น</h3><p>ลดกลิ่นเหม็นและแหล่งเพาะเชื้อโรคจากขยะเน่าเสียที่ปนกับขยะอื่น</p></div>
+      </div>
+      <div class="plain-item">
+        <div class="icon-badge"><svg class="icon"><use href="#i-bag"/></svg></div>
+        <div><h3>ลดปริมาณขยะและค่าใช้จ่ายในการกำจัด</h3><p>ขยะที่ถูกแยกออกไปรีไซเคิลหรือทำปุ๋ย จะไม่ต้องเสียค่าใช้จ่ายส่งไปฝังกลบทั้งหมด</p></div>
+      </div>
+      <div class="plain-item">
+        <div class="icon-badge"><svg class="icon"><use href="#i-recycle"/></svg></div>
+        <div><h3>สร้างรายได้เล็กๆ ให้โรงเรียน</h3><p>วัสดุรีไซเคิลที่รวบรวมได้สามารถขายเข้ากองทุนหรือกิจกรรมของโรงเรียนได้</p></div>
+      </div>
+      <div class="plain-item">
+        <div class="icon-badge"><svg class="icon"><use href="#i-users"/></svg></div>
+        <div><h3>ปลูกฝังนิสัยที่ดีให้นักเรียน</h3><p>พฤติกรรมคัดแยกขยะที่ทำจนเป็นนิสัยในโรงเรียน จะติดตัวไปใช้ที่บ้านและในสังคม</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="roles">
+    <div class="eyebrow-icon roles-icon"><svg class="icon"><use href="#i-users"/></svg></div>
+    <h2>ใครมีบทบาทอะไรบ้าง</h2>
+    <p class="section-lead">การคัดแยกขยะจะสำเร็จได้ต้องอาศัยความร่วมมือของทุกฝ่ายในโรงเรียน</p>
+    <div class="role-block">
+      <h3><span class="dot"></span>นักเรียน</h3>
+      <ul>
+        <li>คัดแยกขยะของตัวเองให้ถูกถังทุกวัน ทั้งในห้องเรียนและโรงอาหาร</li>
+        <li>เป็นตัวอย่างที่ดีและช่วยเตือนเพื่อนเมื่อทิ้งขยะผิดประเภท</li>
+        <li>ร่วมเวรดูแลและตรวจสอบความเรียบร้อยของจุดคัดแยกขยะ</li>
+      </ul>
+    </div>
+    <div class="role-block">
+      <h3><span class="dot"></span>ครูและบุคลากร</h3>
+      <ul>
+        <li>สอดแทรกความรู้เรื่องการคัดแยกขยะเข้ากับบทเรียนหรือกิจกรรมโฮมรูม</li>
+        <li>เป็นแบบอย่างในการคัดแยกขยะให้นักเรียนเห็นอย่างสม่ำเสมอ</li>
+        <li>ให้คำแนะนำและแก้ไขเมื่อพบการคัดแยกที่ยังไม่ถูกต้อง</li>
+      </ul>
+    </div>
+    <div class="role-block">
+      <h3><span class="dot"></span>ฝ่ายบริหารโรงเรียน</h3>
+      <ul>
+        <li>จัดถังคัดแยกให้ครบทั้ง 4 ประเภทในทุกจุดที่มีการทิ้งขยะ พร้อมป้ายที่มองเห็นชัดเจน</li>
+        <li>วางระบบการเก็บขนขยะให้สอดคล้องกับการคัดแยกที่ทำไว้ ไม่นำมารวมกันภายหลัง</li>
+        <li>สนับสนุนงบประมาณและเวลาให้กับกิจกรรมส่งเสริมการคัดแยกขยะอย่างต่อเนื่อง</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="activities">
+    <div class="eyebrow-icon activities-icon"><svg class="icon"><use href="#i-calendar"/></svg></div>
+    <h2>ไอเดียกิจกรรมส่งเสริมในโรงเรียน</h2>
+    <p class="section-lead">การคัดแยกขยะจะน่าสนใจขึ้นมากเมื่อมีกิจกรรมมาช่วยกระตุ้นให้ทุกคนมีส่วนร่วม</p>
+    <div class="activity-grid">
+      <div class="activity-card">
+        <h3>ธนาคารขยะ</h3>
+        <p>ตั้งจุดรับซื้อขยะรีไซเคิลจากนักเรียน พร้อมเปิดบัญชีออมทรัพย์จากขยะให้แต่ละคนหรือแต่ละห้อง</p>
+      </div>
+      <div class="activity-card">
+        <h3>เวรคัดแยกประจำวัน</h3>
+        <p>มอบหมายนักเรียนสลับเวรตรวจสอบและจัดระเบียบถังขยะแต่ละจุดในช่วงพักกลางวัน</p>
+      </div>
+      <div class="activity-card">
+        <h3>ประกวดประดิษฐ์จากวัสดุเหลือใช้</h3>
+        <p>ให้นักเรียนออกแบบและประดิษฐ์สิ่งของจากขยะรีไซเคิล แล้วจัดแสดงผลงานทั้งโรงเรียน</p>
+      </div>
+      <div class="activity-card">
+        <h3>ทำปุ๋ยหมักจากเศษอาหาร</h3>
+        <p>นำขยะอินทรีย์จากโรงอาหารมาทำปุ๋ยหมัก ใช้ต่อในแปลงผักหรือสวนของโรงเรียน</p>
+      </div>
+      <div class="activity-card">
+        <h3>ทูตสิ่งแวดล้อมประจำห้อง</h3>
+        <p>เลือกตัวแทนแต่ละห้องคอยให้ความรู้เพื่อน ติดตามผล และรายงานปัญหาที่พบ</p>
+      </div>
+      <div class="activity-card">
+        <h3>สัปดาห์รณรงค์ลดขยะ</h3>
+        <p>จัดกิจกรรมพิเศษเป็นช่วงๆ เช่น วันงดใช้ถุงพลาสติก หรือสัปดาห์รักษ์โลกทั้งโรงเรียน</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="problems">
+    <div class="eyebrow-icon problems-icon"><svg class="icon"><use href="#i-warning"/></svg></div>
+    <h2>ปัญหาที่พบบ่อยและวิธีแก้ไข</h2>
+    <div class="problem-block">
+      <p class="p-issue"><svg class="icon" style="width:1.1em;height:1.1em"><use href="#i-warning"/></svg>นักเรียนทิ้งขยะผิดถังบ่อยครั้ง</p>
+      <p><span class="fix-label">แนวทางแก้ไข:</span> ติดป้ายภาพตัวอย่างขยะที่ชัดเจนไว้ข้างถังทุกจุด และทบทวนความรู้เรื่องการคัดแยกเป็นระยะผ่านกิจกรรมสั้นๆ</p>
+    </div>
+    <div class="problem-block">
+      <p class="p-issue"><svg class="icon" style="width:1.1em;height:1.1em"><use href="#i-warning"/></svg>ถังขยะมีไม่ครบชุดหรือวางกระจัดกระจาย</p>
+      <p><span class="fix-label">แนวทางแก้ไข:</span> จัดวางถังคัดแยกให้ครบทั้ง 4 สีไว้ในจุดเดียวกันเสมอ ไม่ควรแยกวางเดี่ยวๆ เพราะจะทำให้คัดแยกได้ยาก</p>
+    </div>
+    <div class="problem-block">
+      <p class="p-issue"><svg class="icon" style="width:1.1em;height:1.1em"><use href="#i-warning"/></svg>ทำได้ช่วงแรกแล้วขาดความต่อเนื่อง</p>
+      <p><span class="fix-label">แนวทางแก้ไข:</span> มอบหมายให้มีทีมหรือชมรมรับผิดชอบระยะยาว พร้อมให้ฝ่ายบริหารติดตามผลอย่างสม่ำเสมอ ไม่ใช่แค่ช่วงเปิดโครงการ</p>
+    </div>
+    <div class="problem-block">
+      <p class="p-issue"><svg class="icon" style="width:1.1em;height:1.1em"><use href="#i-warning"/></svg>ขยะรีไซเคิลเปื้อนเศษอาหารจนขายไม่ได้</p>
+      <p><span class="fix-label">แนวทางแก้ไข:</span> ปลูกฝังให้ล้างและผึ่งให้แห้งก่อนทิ้งทุกครั้ง และแยกจุดล้างภาชนะไว้ใกล้กับถังรีไซเคิล</p>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <div class="eyebrow-icon quiz-icon"><svg class="icon"><use href="#i-question"/></svg></div>
+    <h2>มาทดสอบความเข้าใจกัน</h2>
+    <p class="section-lead">ลองดูว่าของแต่ละอย่างนี้ควรทิ้งลงถังสีไหน กดปุ่ม &ldquo;เฉลย&rdquo; เพื่อตรวจคำตอบ</p>
+    <div class="quiz-list">
+      <div class="quiz-item">
+        <div class="quiz-q"><span>เปลือกส้มที่เหลือจากมื้อกลางวัน</span><button class="quiz-btn">เฉลย</button></div>
+        <div class="quiz-answer"><span class="quiz-tag g">ถังเขียว · อินทรีย์</span><p>เปลือกผลไม้ย่อยสลายได้ตามธรรมชาติ นำไปทำปุ๋ยหมักต่อได้</p></div>
+      </div>
+      <div class="quiz-item">
+        <div class="quiz-q"><span>ขวดน้ำพลาสติกที่ล้างสะอาดแล้ว</span><button class="quiz-btn">เฉลย</button></div>
+        <div class="quiz-answer"><span class="quiz-tag y">ถังเหลือง · รีไซเคิล</span><p>ขวดพลาสติกที่สะอาดและแห้ง นำไปแปรรูปใหม่ได้ราคาดี</p></div>
+      </div>
+      <div class="quiz-item">
+        <div class="quiz-q"><span>ซองขนมกรุบกรอบเปื้อนน้ำมัน</span><button class="quiz-btn">เฉลย</button></div>
+        <div class="quiz-answer"><span class="quiz-tag b">ถังน้ำเงิน · ทั่วไป</span><p>ซองขนมส่วนใหญ่เป็นวัสดุผสมหลายชั้น ย่อยสลายยากและไม่คุ้มค่ารีไซเคิล</p></div>
+      </div>
+      <div class="quiz-item">
+        <div class="quiz-q"><span>ถ่านไฟฉายที่ใช้หมดแล้ว</span><button class="quiz-btn">เฉลย</button></div>
+        <div class="quiz-answer"><span class="quiz-tag r">ถังแดง · อันตราย</span><p>มีสารเคมีที่เป็นพิษ ต้องแยกเก็บและส่งไปกำจัดในจุดเฉพาะเท่านั้น</p></div>
+      </div>
+      <div class="quiz-item">
+        <div class="quiz-q"><span>กระดาษที่เขียนเต็มทั้งสองหน้าแล้ว</span><button class="quiz-btn">เฉลย</button></div>
+        <div class="quiz-answer"><span class="quiz-tag y">ถังเหลือง · รีไซเคิล</span><p>กระดาษที่ใช้จนหมดประโยชน์แล้ว สามารถนำไปรีไซเคิลเป็นกระดาษใหม่ได้</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <h2>เริ่มจากถังที่ใกล้ตัวที่สุด</h2>
+    <p>การคัดแยกขยะไม่จำเป็นต้องเริ่มจากเรื่องใหญ่ แค่ทุกคนในโรงเรียนหยุดดูก่อนทิ้งทุกครั้ง ก็เปลี่ยนแปลงได้แล้ว ลองนำเนื้อหาในหน้านี้ไปติดเป็นป้ายความรู้ หรือใช้ประกอบกิจกรรมโฮมรูมของห้องเรียนได้เลย</p>
+    <a href="#" class="back-top" id="backTop">
+      <svg class="icon" style="width:1.1em;height:1.1em"><use href="#i-arrow-up"/></svg>
+      กลับขึ้นด้านบน
+    </a>
+     </div>
+     <h3>คณะผู้จัดทำ</h3> 
+      <p>น.ส.กฤตพร พัฒสิน ม.5/1 เลขที่5</p> 
+      <p>น.ส.ณิชาวดี สวนกูล ม.5/1 เลขที่8</p>
+      <p>น.ส.พรรณทิวา ยะโส ม.5/1 เลขที่11</p>   
+      <p>น.ส.กรภัทร สโมสร ม.5/1 เลขที่12</p>   
+      
+     
+  </div>
+</footer>
+
+
+<script>
+  // scroll-spy for top nav
+  const links = document.querySelectorAll('.topnav-links a');
+  const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href')));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = sections.indexOf(entry.target);
+      if (idx === -1) return;
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        links[idx].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+  sections.forEach(s => s && observer.observe(s));
+
+  // scroll progress bar
+  const navProgress = document.getElementById('navProgress');
+  function updateProgress(){
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const scrollHeight = (doc.scrollHeight || document.body.scrollHeight) - doc.clientHeight;
+    const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    navProgress.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  // quiz reveal
+  document.querySelectorAll('.quiz-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.quiz-item');
+      const open = item.classList.toggle('open');
+      btn.textContent = open ? 'ซ่อนคำตอบ' : 'เฉลย';
+    });
+  });
+
+  document.getElementById('backTop').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+</body>
+</html>
